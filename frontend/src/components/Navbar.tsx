@@ -20,7 +20,7 @@ const Navbar: React.FC<NavbarProps> = () => {
                     </Link>
                 </div>
                 <div>
-                    <Link to={"/create"} className="btn btn-primary">
+                    <Link to={"/graph"} className="btn btn-primary">
                         <span>View Graphs</span>
                     </Link>
                 </div>

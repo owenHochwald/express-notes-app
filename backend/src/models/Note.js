@@ -9,6 +9,7 @@ const noteSchema = new mongoose.Schema({
         type: String,
         required: true
     },
+    connections: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Note' }],
 },
     { timestamps: true }
 );

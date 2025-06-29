@@ -15,7 +15,7 @@ export async function getNote(req, res) {
 export const getAllNotes = async (_, res) => {
 
     try {
-        const notes = await Note.find().sort({createdAt:-1});
+        const notes = await Note.find().sort({ createdAt: -1 });
         res.status(200).json(notes);
     } catch (error) {
         console.error("Error fetching notes:", error);
@@ -23,19 +23,34 @@ export const getAllNotes = async (_, res) => {
     }
 }
 
+export const graphNotes = async (_, res) => {
+    try {
+        const notes = await Note.find({}).populate("connections");
+        console.log("Fetched graph notes:", notes);
+        res.json(notes);
+    } catch (err) {
+        console.error("Error fetching graph notes:", err);
+        res.status(500).json({ message: "Error fetching graph notes" });
+    }
+};
+
 export const createNote = async (req, res) => {
     try {
-        const { title, content } = req.body;
+        const { title, content, connections = [] } = req.body;
+
         const newNote = new Note({
-            title, content
+            title,
+            content,
+            connections,
         });
+
         await newNote.save();
-        res.status(201).json({ message: "Just created the note OG" })
+        res.status(201).json({ message: "Note created successfully", note: newNote });
     } catch (error) {
         console.error("Error creating notes:", error);
-        res.status(500).json({ message: "Error creating notes", error: error.message });
+        res.status(500).json({ message: "Error creating note", error: error.message });
     }
-}
+};
 
 export const updateNote = async (req, res) => {
     try {

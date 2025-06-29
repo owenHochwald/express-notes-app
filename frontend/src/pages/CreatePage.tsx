@@ -1,22 +1,34 @@
 import axios from "axios";
 import { ArrowLeftIcon } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { Link, useNavigate } from "react-router";
 import api from "../lib/axios";
 
+type Note = {
+    _id: string;
+    title: string;
+};
+
 const CreatePage = () => {
     const [title, setTitle] = useState("");
     const [content, setContent] = useState("");
+    const [connections, setConnections] = useState<string[]>([]);
+    const [existingNotes, setExistingNotes] = useState<Note[]>([]);
     const [loading, setLoading] = useState(false);
 
     const navigate = useNavigate();
 
-    const handleSubmit = async (e: MouseEvent) => {
+    useEffect(() => {
+        const fetchNotes = async () => {
+            const res = await api.get<Note[]>("/notes");
+            setExistingNotes(res.data);
+        };
+        fetchNotes();
+    }, []);
+
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-
-        console.log(title, content)
-
 
         if (!title.trim() || !content.trim()) {
             toast.error("All fields are required");
@@ -28,12 +40,13 @@ const CreatePage = () => {
             await api.post("/notes", {
                 title,
                 content,
+                connections,
             });
 
             toast.success("Note created successfully!");
             navigate("/");
         } catch (error) {
-            console.log("Error creating note", error);
+            console.error("Error creating note", error);
             if (axios.isAxiosError(error) && error.response?.status === 429) {
                 toast.error("Slow down! You're creating notes too fast", {
                     duration: 4000,
@@ -45,6 +58,12 @@ const CreatePage = () => {
         } finally {
             setLoading(false);
         }
+    };
+
+    const toggleConnection = (id: string) => {
+        setConnections((prev) =>
+            prev.includes(id) ? prev.filter((n) => n !== id) : [...prev, id]
+        );
     };
 
     return (
@@ -86,6 +105,25 @@ const CreatePage = () => {
                                     />
                                 </div>
 
+                                <div className="form-control">
+                                    <label className="label">
+                                        <span className="label-text">Connect to Other Notes (optional)</span>
+                                    </label>
+                                    <div className="space-y-2 max-h-40 overflow-y-auto border rounded p-2">
+                                        {existingNotes.map((note) => (
+                                            <label key={note._id} className="flex items-center gap-2">
+                                                <input
+                                                    type="checkbox"
+                                                    className="checkbox"
+                                                    checked={connections.includes(note._id)}
+                                                    onChange={() => toggleConnection(note._id)}
+                                                />
+                                                {note.title}
+                                            </label>
+                                        ))}
+                                    </div>
+                                </div>
+
                                 <div className="card-actions justify-end pt-2">
                                     <button type="submit" className="btn btn-primary" disabled={loading}>
                                         {loading ? "Creating..." : "Create Note"}
@@ -98,6 +136,6 @@ const CreatePage = () => {
             </div>
         </div>
     );
-}
+};
 
-    export default CreatePage;
+export default CreatePage;

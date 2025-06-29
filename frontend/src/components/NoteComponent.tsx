@@ -9,6 +9,7 @@ type Note = {
     content: string;
     createdAt: string;
     updatedAt: string;
+    connections: Note[];
 }
 
 
