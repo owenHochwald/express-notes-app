@@ -4,6 +4,7 @@ import axios from "axios";
 import toast from "react-hot-toast";
 import RateLimit from "../components/RateLimit";
 import NoteComponent from "../components/NoteComponent";
+import api from "../lib/axios";
 
 
 type Note = {
@@ -22,7 +23,7 @@ const HomePage = () => {
     useEffect(() => {
         const fetchNotes = async () => {
             try {
-                const response = await axios.get<Note[]>("http://localhost:5001/api/notes");
+                const response = await api.get<Note[]>("/notes");
                 setNotes(response.data);
             }
             catch (error) {
@@ -42,14 +43,20 @@ const HomePage = () => {
 
 
     return (
-        <div>
+        <div >
             <Navbar />
-            {isRateLimited ?
-                <RateLimit />
-                :
-                notes?.map((n: Note, _: number) => <NoteComponent {...n} />)
 
-            }
+            {isRateLimited && <RateLimit />}
+            <div className="max-w-7xl mx-auto p-4 mt-6">
+                {loading && <div className="text-center text-primary py-10">Loading notes... </div>}
+
+                {(notes ?? []).length > 0 && !isRateLimited && (
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        {(notes ?? []).map((n: Note, _: number) => <NoteComponent {...n} />)}
+                    </div>
+                )}
+            </div>
+
         </div>
     )
 }

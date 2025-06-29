@@ -6,7 +6,7 @@ interface NavbarProps { }
 
 const Navbar: React.FC<NavbarProps> = () => {
     return (
-        <div className="navbar bg-base-100 shadow-sm">
+        <div data-theme="coffee" className="navbar bg-base-100 shadow-sm">
             <div className="navbar-start">
             </div>
             <div className="navbar-center">
