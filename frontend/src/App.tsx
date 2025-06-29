@@ -3,15 +3,17 @@ import HomePage from "./pages/HomePage"
 import CreatePage from "./pages/CreatePage"
 import NoteDetailPage from "./pages/NoteDetailPage"
 
-export const App = () => {
+const App = () => {
     return (
-        <div>
+        <div data-theme="coffee">
             <Routes>
                 <Route path="/" element={<HomePage />} />
-                <Route path="/" element={<CreatePage />} />
-                <Route path="/" element={<NoteDetailPage />} />
+                <Route path="/create" element={<CreatePage />} />
+                <Route path="/note:id" element={<NoteDetailPage />} />
             </Routes>
 
         </div>
     )
 }
+
+export default App;
