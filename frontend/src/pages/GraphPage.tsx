@@ -34,15 +34,6 @@ const GraphPage: React.FC = () => {
     [navigate]
   );
 
-  const onNodeDragStop = useCallback(
-    (_event: React.MouseEvent, node: Node) => {
-      setNodes((nds) =>
-        nds.map((n) => (n.id === node.id ? { ...n, position: node.position } : n))
-      );
-    },
-    []
-  );
-
   if (!notes) {
     return <div>Loading graph...</div>;
   }
@@ -58,7 +49,6 @@ const GraphPage: React.FC = () => {
           nodes={nodes}
           edges={edges}
           onNodeClick={handleNodeClick}
-          onNodeDragStop={onNodeDragStop}
         />
       </div>
     </div>
