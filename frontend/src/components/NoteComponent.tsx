@@ -1,7 +1,10 @@
 import { Link } from "react-router";
 import { formatDate } from "../lib/utils";
 import { PenSquareIcon, Trash2Icon } from "lucide-react";
-import type { MouseEvent } from "react";
+import type { MouseEvent as ReactMouseEvent } from "react";
+import api from "../lib/axios";
+import axios from "axios";
+import toast from "react-hot-toast";
 
 type Note = {
     _id: string;
@@ -12,14 +15,32 @@ type Note = {
     connections: Note[];
 }
 
+interface NoteComponentProps {
+    note: Note;
+    setNotes: React.Dispatch<React.SetStateAction<Note[]>>;
+}
 
-
-const NoteComponent = (note: Note) => {
-    const handleDelete = async (e: MouseEvent<HTMLButtonElement, MouseEvent>, id: string) => {
+const NoteComponent: React.FC<NoteComponentProps> = ({ note, setNotes }) => {
+    const handleDelete = async (
+        e: ReactMouseEvent<HTMLButtonElement>,
+        id: string
+    ) => {
         e.preventDefault();
         console.log(id, e);
-    }
 
+        if (!window.confirm("Are you sure you want to delete this note?")) return;
+
+        try {
+            await api.delete(`/notes/${id}`);
+            toast.success("Note deleted successfully");
+            setNotes((prev) => prev ? prev.filter(note => note._id !== id) : prev);
+        } catch (error) {
+            if (axios.isAxiosError(error)) {
+                console.log(error);
+                console.log("There was some sort of server side error");
+            }
+        }
+    };
 
     return (
         <Link
@@ -46,7 +67,7 @@ const NoteComponent = (note: Note) => {
                 </div>
             </div>
         </Link>
-    )
-}
+    );
+};
 
 export default NoteComponent;
